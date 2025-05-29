@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>신발 할인 프로모션</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f4f4;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .promo-details {
+            margin-bottom: 30px;
+            padding: 15px;
+            background-color: #e9f7ef;
+            border-left: 5px solid #28a745;
+            text-align: left;
+        }
+
+        .promo-details strong {
+            color: #28a745;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        label {
+            text-align: left;
+            color: #555;
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #responseMessage {
+            margin-top: 20px;
+            font-weight: bold;
+            color: green;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>👟 신발 할인 프로모션! 👟</h1>
+        <p>놓칠 수 없는 특별한 할인 혜택을 지금 바로 만나보세요!</p>
+
+        <div class="promo-details">
+            <p><strong>프로모션 내용:</strong></p>
+            <ul>
+                <li>최대 50% 할인!</li>
+                <li>한정 수량, 선착순 마감!</li>
+                <li>기간: 2025년 6월 1일 ~ 6월 15일</li>
+            </ul>
+            <p>참여하고 싶으시면 아래 정보를 입력해주세요.</p>
+        </div>
+
+        <form id="promoForm">
+            <label for="name">이름:</label>
+            <input type="text" id="name" name="name" required>
+
+            <label for="phone">전화번호:</label>
+            <input type="text" id="phone" name="phone" placeholder="예: 010-1234-5678" required>
+
+            <button type="submit">참여 신청</button>
+        </form>
+        <div id="responseMessage"></div>
+    </div>
+
+    <script>
+        document.getElementById('promoForm').addEventListener('submit', async function (event) {
+            event.preventDefault(); // 기본 폼 제출 동작 방지
+
+            const name = document.getElementById('name').value;
+            const phone = document.getElementById('phone').value;
+            const responseMessage = document.getElementById('responseMessage');
+
+            // FastAPI 서버의 주소를 정확히 명시합니다.
+            // 여기서는 http://localhost:8000으로 가정합니다.
+            const serverUrl = 'http://localhost:8000/submit_promo';
+
+            try {
+                const response = await fetch(serverUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name, phone }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    responseMessage.style.color = 'green';
+                    responseMessage.textContent = data.message;
+                    document.getElementById('promoForm').reset(); // 폼 초기화
+                } else {
+                    responseMessage.style.color = 'red';
+                    responseMessage.textContent = '오류: ' + (data.detail || '알 수 없는 오류 발생');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                responseMessage.style.color = 'red';
+                responseMessage.textContent = '네트워크 오류가 발생했습니다. 서버가 실행 중인지 확인하세요.';
+            }
+        });
+    </script>
+</body>
+
+</html>
